@@ -5,30 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predicciones: Final del Mundial</title>
     <style>
-        /* Estilos generales y colores planos */
+        /* Estilos Generales - Tema Mundialero */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            /* Fondo verde estilo cancha de césped */
+            background: linear-gradient(135deg, #1B4F31 0%, #2980b9 0%, #27ae60 100%);
             color: #333;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
 
         .container {
             background-color: #ffffff;
             max-width: 500px;
             width: 100%;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Sombra muy sutil */
+            /* Padding en 0 arriba para que la imagen ocupe todo el ancho */
+            padding: 0 0 30px 0; 
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            overflow: hidden; /* Para que la imagen respete los bordes curvos */
+            border: 2px solid #f1c40f; /* Borde dorado */
+        }
+
+        /* Imagen de cabecera */
+        .header-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 5px solid #e67e22; /* Línea naranja divisoria */
+        }
+
+        /* Envoltorio interno para el formulario */
+        .content-wrapper {
+            padding: 0 30px;
         }
 
         h1 {
             text-align: center;
             color: #2c3e50;
+            margin-top: 25px;
             margin-bottom: 25px;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         /* Estilos del formulario */
@@ -38,20 +62,27 @@
 
         label {
             display: block;
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 8px;
-            color: #34495e;
+            color: #16a085;
         }
 
         input[type="text"],
         input[type="number"],
         select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
             box-sizing: border-box;
             font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
         }
 
         /* Contenedor para el resultado exacto */
@@ -63,36 +94,48 @@
 
         .score-group input {
             text-align: center;
+            font-weight: bold;
+            font-size: 18px;
         }
 
-        /* Botón con feedback visual claro */
+        /* Botón con estilo de campeonato (Dorado) */
         button {
             width: 100%;
-            background-color: #27ae60;
-            color: white;
+            background: linear-gradient(to bottom, #f1c40f, #f39c12);
+            color: #fff;
             border: none;
             padding: 15px;
             font-size: 18px;
-            font-weight: bold;
-            border-radius: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         button:hover {
-            background-color: #219150;
+            background: linear-gradient(to bottom, #f39c12, #e67e22);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
         }
 
-        /* Sección de resultados (oculta por ahora) */
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Sección de resultados */
         .results-section {
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 2px solid #ecf0f1;
+            border-top: 2px dashed #bdc3c7;
         }
 
         .results-title {
             text-align: center;
             color: #2c3e50;
+            font-size: 20px;
         }
     </style>
 </head>
@@ -100,7 +143,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE FIREBASE (Asegúrate de mantener tus datos aquí)
+        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBNsybakxpcPT4gzAVgORTL7BYdhHAORlk",
             authDomain: "prediccionesmundial.firebaseapp.com",
@@ -110,21 +153,14 @@
             appId: "1:830569742060:web:b63d058f69e458f4bcafc9"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ------------------------------------
-        // 1. GUARDAR PREDICCIONES (Formulario con Bloqueo)
-        // ------------------------------------
         const form = document.getElementById('predictionForm');
 
-        // Revisamos si el navegador ya tiene la marca de que esta persona votó
         if (localStorage.getItem("yaVoto") === "true") {
-            // Si ya votó, escondemos el formulario y mostramos un mensaje
-            form.innerHTML = "<p style='text-align:center; color: #27ae60; font-weight:bold; font-size: 18px; padding: 20px;'>✅ ¡Ya enviaste tu predicción! Revisa las estadísticas abajo.</p>";
+            form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>✅ ¡Ya participaste!</h3><p style='margin:0;'>Revisa cómo van las estadísticas globales justo abajo.</p></div>";
         } else {
-            // Si no ha votado, permitimos que envíe el formulario
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
@@ -143,34 +179,25 @@
                         fecha: new Date()
                     });
                     
-                    // Guardamos la marca en el navegador para que no vuelva a votar
                     localStorage.setItem("yaVoto", "true");
                     
-                    alert("¡Predicción guardada con éxito!");
-                    
-                    // Reemplazamos el formulario con el mensaje de éxito
-                    form.innerHTML = "<p style='text-align:center; color: #27ae60; font-weight:bold; font-size: 18px; padding: 20px;'>✅ ¡Ya enviaste tu predicción! Revisa las estadísticas abajo.</p>";
+                    form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3><p style='margin:0;'>Tu voto ya está en la base de datos. ¡Mucha suerte!</p></div>";
                     
                 } catch (error) {
                     console.error("Error al guardar: ", error);
-                    alert("Hubo un error al guardar.");
+                    alert("Hubo un error al guardar. Revisa tu conexión.");
                 }
             });
         }
 
-        // ------------------------------------
-        // 2. LEER Y MOSTRAR ESTADÍSTICAS (Tiempo Real)
-        // ------------------------------------
         const resultsSection = document.querySelector('.results-section');
 
-        // Escuchamos los cambios en la colección "predicciones"
         onSnapshot(collection(db, "predicciones"), (snapshot) => {
             let totalVotos = 0;
             let votosA = 0;
             let votosB = 0;
             let listaPrediccionesHTML = "";
 
-            // Recorremos cada voto registrado en Firebase
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 totalVotos++;
@@ -178,81 +205,87 @@
                 if (data.equipoGanador === "equipoA") votosA++;
                 if (data.equipoGanador === "equipoB") votosB++;
 
-                // Vamos armando una lista con los últimos mensajes/votos recibidos
                 listaPrediccionesHTML += `
-                    <div style="padding: 10px; border-bottom: 1px solid #eee; font-size: 14px;">
-                        <strong>${data.nombre}</strong> dice: Gana ${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'} (${data.marcador}) - MVP: ${data.jugadorMVP}
+                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; display:flex; align-items:center;">
+                        <span style="font-size:20px; margin-right:10px;">⚽</span>
+                        <div>
+                            <strong style="color:#2980b9;">${data.nombre}</strong> dice: Gana <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador})<br>
+                            <span style="color:#7f8c8d; font-size: 12px;">🌟 MVP: ${data.jugadorMVP}</span>
+                        </div>
                     </div>
                 `;
             });
 
-            // Calculamos porcentajes si es que hay votos
             const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
             const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
 
-            // Inyectamos el diseño limpio en la sección de estadísticas
             resultsSection.innerHTML = `
-                <h2 class="results-title">Estadísticas Globales</h2>
-                <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">Total de predicciones: ${totalVotos}</p>
+                <h2 class="results-title">Estadísticas Globales 📊</h2>
+                <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Total de predicciones: ${totalVotos}</p>
                 
-                <div style="margin-bottom: 30px;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;">
+                <div style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #2c3e50;">
                         <span>Equipo A (${porcUnA}%)</span>
                         <span>Equipo B (${porcUnB}%)</span>
                     </div>
-                    <div style="display: flex; height: 20px; background-color: #e0e0e0; border-radius: 4px; overflow: hidden;">
-                        <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.5s ease;"></div>
-                        <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.5s ease;"></div>
+                    <div style="display: flex; height: 24px; background-color: #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"></div>
+                        <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"></div>
                     </div>
                 </div>
 
-                <h3 style="color: #2c3e50; font-size: 16px; margin-bottom: 10px;">Muro de Predicciones:</h3>
-                <div style="max-height: 200px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px;">
-                    ${listaPrediccionesHTML || '<p style="text-align:center; padding: 10px; color: #aaa;">Aún no hay votos.</p>'}
+                <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Hinchas:</h3>
+                <div style="max-height: 250px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+                    ${listaPrediccionesHTML || '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Nadie ha votado aún. ¡Sé el primero!</p>'}
                 </div>
             `;
         });
-    </script>
+</script>
 <body>
 
     <div class="container">
-        <h1>🏆 Predicciones de la Final</h1>
+        <!-- Imagen insertada como Banner -->
+        <img src="ttvvimage.png" alt="Nancagua Invierno 2026" class="header-image">
         
-        <form id="predictionForm">
-            <div class="form-group">
-                <label for="username">Tu Nombre:</label>
-                <input type="text" id="username" placeholder="Ej: Juan Pablo" required>
-            </div>
-
-            <div class="form-group">
-                <label for="winner">¿Quién ganará la copa?</label>
-                <select id="winner" required>
-                    <option value="">Selecciona un equipo...</option>
-                    <option value="equipoA">Equipo A</option>
-                    <option value="equipoB">Equipo B</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Marcador Exacto (90 mins):</label>
-                <div class="score-group">
-                    <input type="number" id="scoreA" placeholder="Eq. A" min="0" required>
-                    <span>-</span>
-                    <input type="number" id="scoreB" placeholder="Eq. B" min="0" required>
+        <div class="content-wrapper">
+            <h1>🏆 Predicciones de la Final</h1>
+            
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label for="username">Tu Nombre:</label>
+                    <input type="text" id="username" placeholder="Ej: Juan Pablo" required>
                 </div>
+
+                <div class="form-group">
+                    <label for="winner">¿Quién ganará la copa?</label>
+                    <select id="winner" required>
+                        <option value="">Selecciona un equipo...</option>
+                        <option value="equipoA">Equipo A</option>
+                        <option value="equipoB">Equipo B</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Marcador Exacto (90 mins):</label>
+                    <div class="score-group">
+                        <input type="number" id="scoreA" placeholder="Eq. A" min="0" required>
+                        <span style="font-weight:bold; color:#7f8c8d;">VS</span>
+                        <input type="number" id="scoreB" placeholder="Eq. B" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mvp">Jugador del Partido (MVP):</label>
+                    <input type="text" id="mvp" placeholder="Ej: Messi, Mbappé..." required>
+                </div>
+
+                <button type="submit">¡Enviar Predicción!</button>
+            </form>
+
+            <div class="results-section">
+                <h2 class="results-title">Estadísticas Globales</h2>
+                <p style="text-align: center; color: #7f8c8d;">Conectando con la cancha (cargando base de datos)... ⚽</p>
             </div>
-
-            <div class="form-group">
-                <label for="mvp">Jugador del Partido (MVP):</label>
-                <input type="text" id="mvp" placeholder="Ej: Messi, Mbappé..." required>
-            </div>
-
-            <button type="submit">Enviar Predicción</button>
-        </form>
-
-        <div class="results-section">
-            <h2 class="results-title">Estadísticas Globales</h2>
-            <p style="text-align: center; color: #7f8c8d;">Esperando la conexión a la base de datos...</p>
         </div>
     </div>
 
