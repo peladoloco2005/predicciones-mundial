@@ -161,6 +161,8 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 2px dashed #bdc3c7;
+            /* Oculto por defecto */
+            display: none; 
         }
 
         /* Contenedor privado del muro */
@@ -261,8 +263,8 @@
                 <button type="submit">¡Enviar Predicción de la Cuadrilla!</button>
             </form>
 
-            <!-- SECCIÓN DE RESULTADOS -->
-            <div class="results-section">
+            <!-- SECCIÓN DE RESULTADOS (Oculta por defecto) -->
+            <div class="results-section" id="seccionResultados">
                 <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Estadísticas Globales 📊</h2>
                 <p id="textoConexion" style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Conectando con la cancha (cargando base de datos)... ⚽</p>
                 
@@ -307,7 +309,9 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         const form = document.getElementById('predictionForm');
+        const seccionResultados = document.getElementById('seccionResultados');
 
         const mensajeExitoHTML = `
             <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
@@ -328,6 +332,7 @@
 
         if (localStorage.getItem("yaVoto") === "true") {
             form.innerHTML = mensajeExitoHTML;
+            seccionResultados.style.display = "block"; // Mostrar estadísticas si ya votó
         } else {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -358,6 +363,7 @@
                     
                     localStorage.setItem("yaVoto", "true");
                     form.innerHTML = mensajeExitoHTML; 
+                    seccionResultados.style.display = "block"; // Mostrar estadísticas al enviar con éxito
                     
                 } catch (error) {
                     console.error("Error al guardar: ", error);
