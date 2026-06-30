@@ -51,7 +51,6 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* Títulos de sección */
         .section-title {
             color: #2c3e50;
             font-size: 18px;
@@ -77,6 +76,7 @@
 
         input[type="text"],
         input[type="number"],
+        input[type="password"],
         select {
             width: 100%;
             padding: 12px;
@@ -163,134 +163,21 @@
             border-top: 2px dashed #bdc3c7;
         }
 
-        .results-title {
+        /* Contenedor privado del muro */
+        .locked-muro {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
             text-align: center;
-            color: #2c3e50;
-            font-size: 20px;
+            margin-top: 15px;
         }
     </style>
 </head>
-<script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBNsybakxpcPT4gzAVgORTL7BYdhHAORlk",
-            authDomain: "prediccionesmundial.firebaseapp.com",
-            projectId: "prediccionesmundial",
-            storageBucket: "prediccionesmundial.firebasestorage.app",
-            messagingSenderId: "830569742060",
-            appId: "1:830569742060:web:b63d058f69e458f4bcafc9"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        const form = document.getElementById('predictionForm');
-
-        if (localStorage.getItem("yaVoto") === "true") {
-            form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>✅ ¡Cuadrilla Registrada!</h3><p style='margin:0;'>Tu predicción ya está en la base de datos. Revisa las estadísticas abajo.</p></div>";
-        } else {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                // Datos Principales
-                const username = document.getElementById('username').value;
-                const winner = document.getElementById('winner').value;
-                const scoreA = document.getElementById('scoreA').value;
-                const scoreB = document.getElementById('scoreB').value;
-                const mvp = document.getElementById('mvp').value;
-
-                // Datos Extras
-                const scoreHalfA = document.getElementById('scoreHalfA').value;
-                const scoreHalfB = document.getElementById('scoreHalfB').value;
-                const firstGoal = document.getElementById('firstGoal').value;
-                const penalties = document.getElementById('penalties').value;
-                const youngMvp = document.getElementById('youngMvp').value;
-
-                try {
-                    await addDoc(collection(db, "predicciones"), {
-                        nombre: username,
-                        equipoGanador: winner,
-                        marcador: `${scoreA} - ${scoreB}`,
-                        jugadorMVP: mvp,
-                        marcadorTiempo1: `${scoreHalfA} - ${scoreHalfB}`,
-                        primerGol: firstGoal,
-                        penales: penalties,
-                        mvpJoven: youngMvp,
-                        fecha: new Date()
-                    });
-                    
-                    localStorage.setItem("yaVoto", "true");
-                    
-                    form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3><p style='margin:0;'>Los datos de tu cuadrilla han sido enviados. ¡Mucha suerte!</p></div>";
-                    
-                } catch (error) {
-                    console.error("Error al guardar: ", error);
-                    alert("Hubo un error al guardar. Revisa tu conexión.");
-                }
-            });
-        }
-
-        const resultsSection = document.querySelector('.results-section');
-
-        onSnapshot(collection(db, "predicciones"), (snapshot) => {
-            let totalVotos = 0;
-            let votosA = 0;
-            let votosB = 0;
-            let listaPrediccionesHTML = "";
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                totalVotos++;
-
-                if (data.equipoGanador === "equipoA") votosA++;
-                if (data.equipoGanador === "equipoB") votosB++;
-
-                listaPrediccionesHTML += `
-                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px;">
-                        <div style="display:flex; align-items:center; margin-bottom: 5px;">
-                            <span style="font-size:20px; margin-right:8px;">👥</span>
-                            <strong style="color:#2980b9; font-size: 16px;">${data.nombre}</strong>
-                        </div>
-                        <div style="padding-left: 28px; color: #555;">
-                            Gana: <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador}) | 1er Tiempo: (${data.marcadorTiempo1 || '-'})<br>
-                            ⭐ MVP: ${data.jugadorMVP} | 🌟 Joven: ${data.mvpJoven || '-'}<br>
-                            ⚽ 1er Gol: ${data.primerGol || '-'} | 🥅 Penales: ${data.penales ? data.penales.toUpperCase() : '-'}
-                        </div>
-                    </div>
-                `;
-            });
-
-            const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
-            const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
-
-            resultsSection.innerHTML = `
-                <h2 class="results-title">Estadísticas Globales 📊</h2>
-                <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Cuadrillas participando: ${totalVotos}</p>
-                
-                <div style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #2c3e50;">
-                        <span>Equipo A (${porcUnA}%)</span>
-                        <span>Equipo B (${porcUnB}%)</span>
-                    </div>
-                    <div style="display: flex; height: 24px; background-color: #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease;"></div>
-                        <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease;"></div>
-                    </div>
-                </div>
-
-                <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Cuadrillas:</h3>
-                <div style="max-height: 300px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
-                    ${listaPrediccionesHTML || '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Ninguna cuadrilla ha votado aún. ¡Sé la primera!</p>'}
-                </div>
-            `;
-        });
-</script>
 <body>
 
     <div class="container">
-        <!-- Imagen insertada como Banner -->
+        <!-- Imagen Banner -->
         <img src="image_f6e307.png" alt="Nancagua Invierno 2026" class="header-image">
         
         <div class="content-wrapper">
@@ -360,7 +247,7 @@
                 </div>
 
                 <!-- TABLA DE PUNTUACIÓN (Reglas) -->
-                <div class="scoring-rules">
+                <div class="scoring-rules" id="reglasPuntaje">
                     <h4>📋 ¿Cómo se reparten los puntos?</h4>
                     <ul>
                         <li><strong>5 pts:</strong> Acertar al resultado final exacto (90 mins).</li>
@@ -374,12 +261,184 @@
                 <button type="submit">¡Enviar Predicción de la Cuadrilla!</button>
             </form>
 
+            <!-- SECCIÓN DE RESULTADOS -->
             <div class="results-section">
-                <h2 class="results-title">Estadísticas Globales</h2>
-                <p style="text-align: center; color: #7f8c8d;">Conectando con la cancha (cargando base de datos)... ⚽</p>
+                <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Estadísticas Globales 📊</h2>
+                <p id="textoConexion" style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Conectando con la cancha (cargando base de datos)... ⚽</p>
+                
+                <div id="graficoBarras" style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1; display:none;">
+                    <!-- Las barras se inyectan aquí con JS -->
+                </div>
+
+                <!-- MURO CON CONTRASEÑA -->
+                <div style="text-align: center;">
+                    <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Cuadrillas 🔒</h3>
+                    
+                    <div id="cajaCandado" class="locked-muro">
+                        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">Muro privado. Solo el administrador puede ver las predicciones de todos.</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <input type="password" id="inputClave" placeholder="Ingresa la clave..." style="width: 200px;">
+                            <button type="button" id="btnDesbloquear" style="width: auto; padding: 10px 15px; font-size: 14px;">Desbloquear</button>
+                        </div>
+                        <p id="errorClave" style="color: #e74c3c; font-size: 13px; margin-top: 10px; display: none;">Clave incorrecta</p>
+                    </div>
+
+                    <div id="listaPredicciones" style="display:none; max-height: 400px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
+                        <!-- La lista de cuadrillas se inyecta aquí -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPTS FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNsybakxpcPT4gzAVgORTL7BYdhHAORlk",
+            authDomain: "prediccionesmundial.firebaseapp.com",
+            projectId: "prediccionesmundial",
+            storageBucket: "prediccionesmundial.firebasestorage.app",
+            messagingSenderId: "830569742060",
+            appId: "1:830569742060:web:b63d058f69e458f4bcafc9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const form = document.getElementById('predictionForm');
+
+        // Plantilla del mensaje de éxito que INCLUYE las reglas de puntuación
+        const mensajeExitoHTML = `
+            <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
+                <h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3>
+                <p style='margin:0;'>Los datos de tu cuadrilla han sido enviados exitosamente.</p>
+            </div>
+            <!-- Mantenemos la tabla de puntos visible -->
+            <div class="scoring-rules">
+                <h4>📋 ¿Cómo se reparten los puntos?</h4>
+                <ul>
+                    <li><strong>5 pts:</strong> Acertar al resultado final exacto (90 mins).</li>
+                    <li><strong>4 pts:</strong> Acertar al Jugador MVP.</li>
+                    <li><strong>3 pts:</strong> Acertar al resultado exacto del 1er tiempo.</li>
+                    <li><strong>2 pts:</strong> Acertar al MVP Joven.</li>
+                    <li><strong>1 pto:</strong> Acertar si van a penales (Sí o No).</li>
+                </ul>
+            </div>
+        `;
+
+        if (localStorage.getItem("yaVoto") === "true") {
+            form.innerHTML = mensajeExitoHTML;
+        } else {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const winner = document.getElementById('winner').value;
+                const scoreA = document.getElementById('scoreA').value;
+                const scoreB = document.getElementById('scoreB').value;
+                const mvp = document.getElementById('mvp').value;
+                const scoreHalfA = document.getElementById('scoreHalfA').value;
+                const scoreHalfB = document.getElementById('scoreHalfB').value;
+                const firstGoal = document.getElementById('firstGoal').value;
+                const penalties = document.getElementById('penalties').value;
+                const youngMvp = document.getElementById('youngMvp').value;
+
+                try {
+                    await addDoc(collection(db, "predicciones"), {
+                        nombre: username,
+                        equipoGanador: winner,
+                        marcador: `${scoreA} - ${scoreB}`,
+                        jugadorMVP: mvp,
+                        marcadorTiempo1: `${scoreHalfA} - ${scoreHalfB}`,
+                        primerGol: firstGoal,
+                        penales: penalties,
+                        mvpJoven: youngMvp,
+                        fecha: new Date()
+                    });
+                    
+                    localStorage.setItem("yaVoto", "true");
+                    form.innerHTML = mensajeExitoHTML; // Muestra éxito + puntajes
+                    
+                } catch (error) {
+                    console.error("Error al guardar: ", error);
+                    alert("Hubo un error al guardar. Revisa tu conexión.");
+                }
+            });
+        }
+
+        // LÓGICA DE LA CLAVE SECRETA
+        const claveSecreta = "nancagua26"; // <--- CAMBIA LA CLAVE AQUÍ SI QUIERES
+        const btnDesbloquear = document.getElementById('btnDesbloquear');
+        const cajaCandado = document.getElementById('cajaCandado');
+        const listaPredicciones = document.getElementById('listaPredicciones');
+        const errorClave = document.getElementById('errorClave');
+
+        btnDesbloquear.addEventListener('click', () => {
+            const claveIngresada = document.getElementById('inputClave').value;
+            if(claveIngresada === claveSecreta) {
+                cajaCandado.style.display = 'none'; // Oculta el candado
+                listaPredicciones.style.display = 'block'; // Muestra el muro
+            } else {
+                errorClave.style.display = 'block'; // Muestra error
+            }
+        });
+
+        // LECTURA DE DATOS EN TIEMPO REAL
+        onSnapshot(collection(db, "predicciones"), (snapshot) => {
+            let totalVotos = 0;
+            let votosA = 0;
+            let votosB = 0;
+            let listaHTML = "";
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                totalVotos++;
+
+                if (data.equipoGanador === "equipoA") votosA++;
+                if (data.equipoGanador === "equipoB") votosB++;
+
+                listaHTML += `
+                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px;">
+                        <div style="display:flex; align-items:center; margin-bottom: 5px;">
+                            <span style="font-size:20px; margin-right:8px;">👥</span>
+                            <strong style="color:#2980b9; font-size: 16px;">${data.nombre}</strong>
+                        </div>
+                        <div style="padding-left: 28px; color: #555;">
+                            Gana: <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador}) | 1er Tpo: (${data.marcadorTiempo1 || '-'})<br>
+                            ⭐ MVP: ${data.jugadorMVP} | 🌟 Joven: ${data.mvpJoven || '-'}<br>
+                            ⚽ 1er Gol: ${data.primerGol || '-'} | 🥅 Penales: ${data.penales ? data.penales.toUpperCase() : '-'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
+            const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
+
+            // Actualizamos los textos sin sobreescribir el HTML de la clave
+            document.getElementById('textoConexion').innerText = `Cuadrillas participando: ${totalVotos}`;
+            
+            document.getElementById('graficoBarras').style.display = 'block';
+            document.getElementById('graficoBarras').innerHTML = `
+                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #2c3e50;">
+                    <span>Equipo A (${porcUnA}%)</span>
+                    <span>Equipo B (${porcUnB}%)</span>
+                </div>
+                <div style="display: flex; height: 24px; background-color: #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease;"></div>
+                    <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease;"></div>
+                </div>
+            `;
+
+            // Llenamos la lista del muro oculto
+            if (listaHTML === "") {
+                listaPredicciones.innerHTML = '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Ninguna cuadrilla ha votado aún.</p>';
+            } else {
+                listaPredicciones.innerHTML = listaHTML;
+            }
+        });
+    </script>
 </body>
 </html>
