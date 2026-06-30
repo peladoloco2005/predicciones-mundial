@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predicciones: Final del Mundial</title>
     <style>
-        /* Estilos Generales - Tema Mundialero */
+        /* Estilos Generales - Tema Mundialero con Imagen de Fondo */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1B4F31 0%, #2980b9 0%, #27ae60 100%);
+            background-image: url('munndialfondo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Hace que el fondo no se mueva al hacer scroll */
             color: #333;
             margin: 0;
             padding: 20px;
@@ -19,12 +22,14 @@
         }
 
         .container {
-            background-color: #ffffff;
+            /* Fondo blanco semitransparente para que se vea el fondo pero permita leer */
+            background-color: rgba(255, 255, 255, 0.92); 
+            backdrop-filter: blur(8px); /* Efecto de vidrio esmerilado */
             max-width: 550px;
             width: 100%;
             padding: 0 0 30px 0; 
             border-radius: 12px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
             overflow: hidden; 
             border: 2px solid #f1c40f; 
         }
@@ -36,6 +41,18 @@
             border-bottom: 5px solid #e67e22;
         }
 
+        /* Estilos para el nuevo Logo del Mundial */
+        .mundial-logo {
+            display: block;
+            margin: 20px auto 0 auto;
+            width: 110px; /* Tamaño del logo ajustado */
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: 3px solid #f1c40f;
+            background-color: #000;
+        }
+
         .content-wrapper {
             padding: 0 30px;
         }
@@ -43,12 +60,12 @@
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-top: 25px;
+            margin-top: 20px;
             margin-bottom: 25px;
             font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }
 
         .section-title {
@@ -85,6 +102,7 @@
             box-sizing: border-box;
             font-size: 16px;
             transition: border-color 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
         }
 
         input:focus, select:focus {
@@ -107,7 +125,7 @@
 
         /* Tabla de Puntuación */
         .scoring-rules {
-            background-color: #fff8e1;
+            background-color: rgba(255, 248, 225, 0.9);
             border-left: 5px solid #f1c40f;
             padding: 15px;
             border-radius: 6px;
@@ -161,13 +179,12 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 2px dashed #bdc3c7;
-            /* Oculto por defecto */
             display: none; 
         }
 
         /* Contenedor privado del muro */
         .locked-muro {
-            background: #fafafa;
+            background: rgba(250, 250, 250, 0.9);
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 20px;
@@ -179,10 +196,13 @@
 <body>
 
     <div class="container">
-        <!-- Imagen Banner actualizada con el nuevo nombre -->
+        <!-- Imagen Banner Inicial -->
         <img src="ttvvimage.png" alt="Nancagua Invierno 2026" class="header-image">
         
         <div class="content-wrapper">
+            <!-- Logo del Mundial Centrado -->
+            <img src="logomund.jpg" alt="Logo del Mundial" class="mundial-logo">
+            
             <h1>🏆 Predicciones de la Final</h1>
             
             <form id="predictionForm">
@@ -268,7 +288,7 @@
                 <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Estadísticas Globales 📊</h2>
                 <p id="textoConexion" style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Conectando con la cancha (cargando base de datos)... ⚽</p>
                 
-                <div id="graficoBarras" style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1; display:none;">
+                <div id="graficoBarras" style="margin-bottom: 30px; background: rgba(249, 249, 249, 0.9); padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1; display:none;">
                     <!-- Las barras se inyectan aquí con JS -->
                 </div>
 
@@ -285,7 +305,7 @@
                         <p id="errorClave" style="color: #e74c3c; font-size: 13px; margin-top: 10px; display: none;">Clave incorrecta</p>
                     </div>
 
-                    <div id="listaPredicciones" style="display:none; max-height: 400px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
+                    <div id="listaPredicciones" style="display:none; max-height: 400px; overflow-y: auto; background: rgba(250, 250, 250, 0.9); border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
                         <!-- La lista de cuadrillas se inyecta aquí -->
                     </div>
                 </div>
@@ -314,7 +334,7 @@
         const seccionResultados = document.getElementById('seccionResultados');
 
         const mensajeExitoHTML = `
-            <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
+            <div style='text-align:center; padding: 20px; background:rgba(232, 248, 245, 0.95); border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
                 <h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3>
                 <p style='margin:0;'>Los datos de tu cuadrilla han sido enviados exitosamente.</p>
             </div>
@@ -332,7 +352,7 @@
 
         if (localStorage.getItem("yaVoto") === "true") {
             form.innerHTML = mensajeExitoHTML;
-            seccionResultados.style.display = "block"; // Mostrar estadísticas si ya votó
+            seccionResultados.style.display = "block";
         } else {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -363,7 +383,7 @@
                     
                     localStorage.setItem("yaVoto", "true");
                     form.innerHTML = mensajeExitoHTML; 
-                    seccionResultados.style.display = "block"; // Mostrar estadísticas al enviar con éxito
+                    seccionResultados.style.display = "block";
                     
                 } catch (error) {
                     console.error("Error al guardar: ", error);
@@ -372,7 +392,7 @@
             });
         }
 
-        const claveSecreta = "nancagua26.2806";
+        const claveSecreta = "nancagua26";
         const btnDesbloquear = document.getElementById('btnDesbloquear');
         const cajaCandado = document.getElementById('cajaCandado');
         const listaPredicciones = document.getElementById('listaPredicciones');
