@@ -8,7 +8,6 @@
         /* Estilos Generales - Tema Mundialero */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Fondo verde estilo cancha de césped */
             background: linear-gradient(135deg, #1B4F31 0%, #2980b9 0%, #27ae60 100%);
             color: #333;
             margin: 0;
@@ -21,25 +20,22 @@
 
         .container {
             background-color: #ffffff;
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
-            /* Padding en 0 arriba para que la imagen ocupe todo el ancho */
             padding: 0 0 30px 0; 
             border-radius: 12px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            overflow: hidden; /* Para que la imagen respete los bordes curvos */
-            border: 2px solid #f1c40f; /* Borde dorado */
+            overflow: hidden; 
+            border: 2px solid #f1c40f; 
         }
 
-        /* Imagen de cabecera */
         .header-image {
             width: 100%;
             height: auto;
             display: block;
-            border-bottom: 5px solid #e67e22; /* Línea naranja divisoria */
+            border-bottom: 5px solid #e67e22;
         }
 
-        /* Envoltorio interno para el formulario */
         .content-wrapper {
             padding: 0 30px;
         }
@@ -55,7 +51,19 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* Estilos del formulario */
+        /* Títulos de sección */
+        .section-title {
+            color: #2c3e50;
+            font-size: 18px;
+            border-bottom: 2px solid #16a085;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -85,7 +93,6 @@
             box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
         }
 
-        /* Contenedor para el resultado exacto */
         .score-group {
             display: flex;
             gap: 15px;
@@ -98,7 +105,32 @@
             font-size: 18px;
         }
 
-        /* Botón con estilo de campeonato (Dorado) */
+        /* Tabla de Puntuación */
+        .scoring-rules {
+            background-color: #fff8e1;
+            border-left: 5px solid #f1c40f;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #5d4037;
+        }
+
+        .scoring-rules h4 {
+            margin: 0 0 10px 0;
+            color: #d35400;
+            font-size: 16px;
+        }
+
+        .scoring-rules ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .scoring-rules li {
+            margin-bottom: 5px;
+        }
+
         button {
             width: 100%;
             background: linear-gradient(to bottom, #f1c40f, #f39c12);
@@ -125,7 +157,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* Sección de resultados */
         .results-section {
             margin-top: 40px;
             padding-top: 20px;
@@ -143,7 +174,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBNsybakxpcPT4gzAVgORTL7BYdhHAORlk",
             authDomain: "prediccionesmundial.firebaseapp.com",
@@ -159,16 +189,24 @@
         const form = document.getElementById('predictionForm');
 
         if (localStorage.getItem("yaVoto") === "true") {
-            form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>✅ ¡Ya participaste!</h3><p style='margin:0;'>Revisa cómo van las estadísticas globales justo abajo.</p></div>";
+            form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>✅ ¡Cuadrilla Registrada!</h3><p style='margin:0;'>Tu predicción ya está en la base de datos. Revisa las estadísticas abajo.</p></div>";
         } else {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
+                // Datos Principales
                 const username = document.getElementById('username').value;
                 const winner = document.getElementById('winner').value;
                 const scoreA = document.getElementById('scoreA').value;
                 const scoreB = document.getElementById('scoreB').value;
                 const mvp = document.getElementById('mvp').value;
+
+                // Datos Extras
+                const scoreHalfA = document.getElementById('scoreHalfA').value;
+                const scoreHalfB = document.getElementById('scoreHalfB').value;
+                const firstGoal = document.getElementById('firstGoal').value;
+                const penalties = document.getElementById('penalties').value;
+                const youngMvp = document.getElementById('youngMvp').value;
 
                 try {
                     await addDoc(collection(db, "predicciones"), {
@@ -176,12 +214,16 @@
                         equipoGanador: winner,
                         marcador: `${scoreA} - ${scoreB}`,
                         jugadorMVP: mvp,
+                        marcadorTiempo1: `${scoreHalfA} - ${scoreHalfB}`,
+                        primerGol: firstGoal,
+                        penales: penalties,
+                        mvpJoven: youngMvp,
                         fecha: new Date()
                     });
                     
                     localStorage.setItem("yaVoto", "true");
                     
-                    form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3><p style='margin:0;'>Tu voto ya está en la base de datos. ¡Mucha suerte!</p></div>";
+                    form.innerHTML = "<div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60;'><h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3><p style='margin:0;'>Los datos de tu cuadrilla han sido enviados. ¡Mucha suerte!</p></div>";
                     
                 } catch (error) {
                     console.error("Error al guardar: ", error);
@@ -206,11 +248,15 @@
                 if (data.equipoGanador === "equipoB") votosB++;
 
                 listaPrediccionesHTML += `
-                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; display:flex; align-items:center;">
-                        <span style="font-size:20px; margin-right:10px;">⚽</span>
-                        <div>
-                            <strong style="color:#2980b9;">${data.nombre}</strong> dice: Gana <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador})<br>
-                            <span style="color:#7f8c8d; font-size: 12px;">🌟 MVP: ${data.jugadorMVP}</span>
+                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px;">
+                        <div style="display:flex; align-items:center; margin-bottom: 5px;">
+                            <span style="font-size:20px; margin-right:8px;">👥</span>
+                            <strong style="color:#2980b9; font-size: 16px;">${data.nombre}</strong>
+                        </div>
+                        <div style="padding-left: 28px; color: #555;">
+                            Gana: <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador}) | 1er Tiempo: (${data.marcadorTiempo1 || '-'})<br>
+                            ⭐ MVP: ${data.jugadorMVP} | 🌟 Joven: ${data.mvpJoven || '-'}<br>
+                            ⚽ 1er Gol: ${data.primerGol || '-'} | 🥅 Penales: ${data.penales ? data.penales.toUpperCase() : '-'}
                         </div>
                     </div>
                 `;
@@ -221,7 +267,7 @@
 
             resultsSection.innerHTML = `
                 <h2 class="results-title">Estadísticas Globales 📊</h2>
-                <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Total de predicciones: ${totalVotos}</p>
+                <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Cuadrillas participando: ${totalVotos}</p>
                 
                 <div style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1;">
                     <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #2c3e50;">
@@ -229,14 +275,14 @@
                         <span>Equipo B (${porcUnB}%)</span>
                     </div>
                     <div style="display: flex; height: 24px; background-color: #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                        <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"></div>
-                        <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease; display:flex; align-items:center; justify-content:center; color:white; font-size:12px;"></div>
+                        <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease;"></div>
+                        <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease;"></div>
                     </div>
                 </div>
 
-                <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Hinchas:</h3>
-                <div style="max-height: 250px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
-                    ${listaPrediccionesHTML || '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Nadie ha votado aún. ¡Sé el primero!</p>'}
+                <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Cuadrillas:</h3>
+                <div style="max-height: 300px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+                    ${listaPrediccionesHTML || '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Ninguna cuadrilla ha votado aún. ¡Sé la primera!</p>'}
                 </div>
             `;
         });
@@ -245,15 +291,18 @@
 
     <div class="container">
         <!-- Imagen insertada como Banner -->
-        <img src="ttvvimage.png" alt="Nancagua Invierno 2026" class="header-image">
+        <img src="image_f6e307.png" alt="Nancagua Invierno 2026" class="header-image">
         
         <div class="content-wrapper">
             <h1>🏆 Predicciones de la Final</h1>
             
             <form id="predictionForm">
+                
+                <h3 class="section-title">⭐ Predicción Principal</h3>
+                
                 <div class="form-group">
-                    <label for="username">Tu Nombre:</label>
-                    <input type="text" id="username" placeholder="Ej: Juan Pablo" required>
+                    <label for="username">Nombre de Cuadrilla:</label>
+                    <input type="text" id="username" placeholder="Ej: Los Campeones" required>
                 </div>
 
                 <div class="form-group">
@@ -266,7 +315,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Marcador Exacto (90 mins):</label>
+                    <label>Marcador Final Exacto (90 mins):</label>
                     <div class="score-group">
                         <input type="number" id="scoreA" placeholder="Eq. A" min="0" required>
                         <span style="font-weight:bold; color:#7f8c8d;">VS</span>
@@ -279,7 +328,50 @@
                     <input type="text" id="mvp" placeholder="Ej: Messi, Mbappé..." required>
                 </div>
 
-                <button type="submit">¡Enviar Predicción!</button>
+                <!-- SECCIÓN EXTRAS -->
+                <h3 class="section-title">⚽ Detalles Extras</h3>
+
+                <div class="form-group">
+                    <label>Marcador 1er Tiempo (45 mins):</label>
+                    <div class="score-group">
+                        <input type="number" id="scoreHalfA" placeholder="Eq. A" min="0" required>
+                        <span style="font-weight:bold; color:#7f8c8d;">VS</span>
+                        <input type="number" id="scoreHalfB" placeholder="Eq. B" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="firstGoal">¿Quién hará el primer gol del partido?</label>
+                    <input type="text" id="firstGoal" placeholder="Nombre del jugador o 'Ninguno'" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="penalties">¿El partido se define en penales?</label>
+                    <select id="penalties" required>
+                        <option value="">Selecciona...</option>
+                        <option value="si">Sí, van a penales</option>
+                        <option value="no">No, se define antes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="youngMvp">Mejor Jugador Joven (MVP Joven):</label>
+                    <input type="text" id="youngMvp" placeholder="Ej: Lamine Yamal..." required>
+                </div>
+
+                <!-- TABLA DE PUNTUACIÓN (Reglas) -->
+                <div class="scoring-rules">
+                    <h4>📋 ¿Cómo se reparten los puntos?</h4>
+                    <ul>
+                        <li><strong>5 pts:</strong> Acertar al resultado final exacto (90 mins).</li>
+                        <li><strong>4 pts:</strong> Acertar al Jugador MVP.</li>
+                        <li><strong>3 pts:</strong> Acertar al resultado exacto del 1er tiempo.</li>
+                        <li><strong>2 pts:</strong> Acertar al MVP Joven.</li>
+                        <li><strong>1 pto:</strong> Acertar si van a penales (Sí o No).</li>
+                    </ul>
+                </div>
+
+                <button type="submit">¡Enviar Predicción de la Cuadrilla!</button>
             </form>
 
             <div class="results-section">
