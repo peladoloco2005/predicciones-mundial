@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predicciones: Final del Mundial</title>
     <style>
-        /* Estilos Generales - Tema Mundialero con Imagen de Fondo */
+        /* Estilos Generales - Volvemos al fondo verde previo */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-image: url('munndialfondo.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; /* Hace que el fondo no se mueva al hacer scroll */
+            background: linear-gradient(135deg, #1B4F31 0%, #2980b9 0%, #27ae60 100%);
             color: #333;
             margin: 0;
             padding: 20px;
@@ -22,14 +19,12 @@
         }
 
         .container {
-            /* Fondo blanco semitransparente para que se vea el fondo pero permita leer */
-            background-color: rgba(255, 255, 255, 0.92); 
-            backdrop-filter: blur(8px); /* Efecto de vidrio esmerilado */
+            background-color: rgba(255, 255, 255, 0.95); 
             max-width: 550px;
             width: 100%;
             padding: 0 0 30px 0; 
             border-radius: 12px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             overflow: hidden; 
             border: 2px solid #f1c40f; 
         }
@@ -41,16 +36,17 @@
             border-bottom: 5px solid #e67e22;
         }
 
-       /* Estilos para el nuevo Logo del Mundial */
+        /* Logo con fondo blanco aplicado */
         .mundial-logo {
             display: block;
             margin: 20px auto 10px auto;
-            max-width: 120px; /* Tamaño máximo */
-            height: auto;     /* Mantiene la proporción original */
-            border-radius: 8px; /* Cambiamos a esquinas redondeadas suaves */
+            max-width: 120px;
+            height: auto;
+            border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             border: 2px solid #f1c40f;
-            background-color: transparent; /* Quitamos el fondo negro por si la imagen es transparente */
+            background-color: #ffffff; /* Fondo blanco para el logo */
+            padding: 5px; /* Pequeño margen interno para el logo */
         }
 
         .content-wrapper {
@@ -65,7 +61,6 @@
             font-size: 24px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }
 
         .section-title {
@@ -102,7 +97,6 @@
             box-sizing: border-box;
             font-size: 16px;
             transition: border-color 0.3s;
-            background-color: rgba(255, 255, 255, 0.9);
         }
 
         input:focus, select:focus {
@@ -123,9 +117,8 @@
             font-size: 18px;
         }
 
-        /* Tabla de Puntuación */
         .scoring-rules {
-            background-color: rgba(255, 248, 225, 0.9);
+            background-color: #fff8e1;
             border-left: 5px solid #f1c40f;
             padding: 15px;
             border-radius: 6px;
@@ -182,9 +175,8 @@
             display: none; 
         }
 
-        /* Contenedor privado del muro */
         .locked-muro {
-            background: rgba(250, 250, 250, 0.9);
+            background: #fafafa;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 20px;
@@ -196,19 +188,15 @@
 <body>
 
     <div class="container">
-        <!-- Imagen Banner Inicial -->
         <img src="ttvvimage.png" alt="Nancagua Invierno 2026" class="header-image">
         
         <div class="content-wrapper">
-            <!-- Logo del Mundial Centrado -->
             <img src="logomund.png" alt="Logo del Mundial" class="mundial-logo">
             
             <h1>🏆 Predicciones de la Final</h1>
             
             <form id="predictionForm">
-                
                 <h3 class="section-title">⭐ Predicción Principal</h3>
-                
                 <div class="form-group">
                     <label for="username">Nombre de Cuadrilla:</label>
                     <input type="text" id="username" placeholder="Ej: Los Campeones" required>
@@ -237,9 +225,7 @@
                     <input type="text" id="mvp" placeholder="Ej: Messi, Mbappé..." required>
                 </div>
 
-                <!-- SECCIÓN EXTRAS -->
                 <h3 class="section-title">⚽ Detalles Extras</h3>
-
                 <div class="form-group">
                     <label>Marcador 1er Tiempo (45 mins):</label>
                     <div class="score-group">
@@ -268,7 +254,6 @@
                     <input type="text" id="youngMvp" placeholder="Ej: Lamine Yamal..." required>
                 </div>
 
-                <!-- TABLA DE PUNTUACIÓN (Reglas) -->
                 <div class="scoring-rules" id="reglasPuntaje">
                     <h4>📋 ¿Cómo se reparten los puntos?</h4>
                     <ul>
@@ -283,37 +268,28 @@
                 <button type="submit">¡Enviar Predicción de la Cuadrilla!</button>
             </form>
 
-            <!-- SECCIÓN DE RESULTADOS (Oculta por defecto) -->
             <div class="results-section" id="seccionResultados">
                 <h2 style="text-align: center; color: #2c3e50; font-size: 20px;">Estadísticas Globales 📊</h2>
-                <p id="textoConexion" style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Conectando con la cancha (cargando base de datos)... ⚽</p>
+                <p id="textoConexion" style="text-align: center; color: #7f8c8d; margin-bottom: 20px; font-weight:bold;">Conectando con la cancha...</p>
                 
-                <div id="graficoBarras" style="margin-bottom: 30px; background: rgba(249, 249, 249, 0.9); padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1; display:none;">
-                    <!-- Las barras se inyectan aquí con JS -->
-                </div>
+                <div id="graficoBarras" style="margin-bottom: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #ecf0f1; display:none;"></div>
 
-                <!-- MURO CON CONTRASEÑA -->
                 <div style="text-align: center;">
                     <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Cuadrillas 🔒</h3>
-                    
                     <div id="cajaCandado" class="locked-muro">
-                        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">Muro privado. Solo el administrador puede ver las predicciones de todos.</p>
+                        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">Muro privado. Solo el administrador puede ver las predicciones.</p>
                         <div style="display: flex; gap: 10px; justify-content: center;">
                             <input type="password" id="inputClave" placeholder="Ingresa la clave..." style="width: 200px;">
                             <button type="button" id="btnDesbloquear" style="width: auto; padding: 10px 15px; font-size: 14px;">Desbloquear</button>
                         </div>
                         <p id="errorClave" style="color: #e74c3c; font-size: 13px; margin-top: 10px; display: none;">Clave incorrecta</p>
                     </div>
-
-                    <div id="listaPredicciones" style="display:none; max-height: 400px; overflow-y: auto; background: rgba(250, 250, 250, 0.9); border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
-                        <!-- La lista de cuadrillas se inyecta aquí -->
-                    </div>
+                    <div id="listaPredicciones" style="display:none; max-height: 400px; overflow-y: auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -334,7 +310,7 @@
         const seccionResultados = document.getElementById('seccionResultados');
 
         const mensajeExitoHTML = `
-            <div style='text-align:center; padding: 20px; background:rgba(232, 248, 245, 0.95); border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
+            <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
                 <h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3>
                 <p style='margin:0;'>Los datos de tu cuadrilla han sido enviados exitosamente.</p>
             </div>
@@ -356,7 +332,6 @@
         } else {
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-
                 const username = document.getElementById('username').value;
                 const winner = document.getElementById('winner').value;
                 const scoreA = document.getElementById('scoreA').value;
@@ -380,11 +355,9 @@
                         mvpJoven: youngMvp,
                         fecha: new Date()
                     });
-                    
                     localStorage.setItem("yaVoto", "true");
                     form.innerHTML = mensajeExitoHTML; 
                     seccionResultados.style.display = "block";
-                    
                 } catch (error) {
                     console.error("Error al guardar: ", error);
                     alert("Hubo un error al guardar. Revisa tu conexión.");
@@ -393,71 +366,42 @@
         }
 
         const claveSecreta = "nancagua26";
-        const btnDesbloquear = document.getElementById('btnDesbloquear');
-        const cajaCandado = document.getElementById('cajaCandado');
-        const listaPredicciones = document.getElementById('listaPredicciones');
-        const errorClave = document.getElementById('errorClave');
-
-        btnDesbloquear.addEventListener('click', () => {
+        document.getElementById('btnDesbloquear').addEventListener('click', () => {
             const claveIngresada = document.getElementById('inputClave').value;
             if(claveIngresada === claveSecreta) {
-                cajaCandado.style.display = 'none'; 
-                listaPredicciones.style.display = 'block'; 
+                document.getElementById('cajaCandado').style.display = 'none'; 
+                document.getElementById('listaPredicciones').style.display = 'block'; 
             } else {
-                errorClave.style.display = 'block'; 
+                document.getElementById('errorClave').style.display = 'block'; 
             }
         });
 
         onSnapshot(collection(db, "predicciones"), (snapshot) => {
-            let totalVotos = 0;
-            let votosA = 0;
-            let votosB = 0;
-            let listaHTML = "";
-
+            let totalVotos = 0, votosA = 0, votosB = 0, listaHTML = "";
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 totalVotos++;
-
                 if (data.equipoGanador === "equipoA") votosA++;
                 if (data.equipoGanador === "equipoB") votosB++;
-
                 listaHTML += `
                     <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px;">
-                        <div style="display:flex; align-items:center; margin-bottom: 5px;">
-                            <span style="font-size:20px; margin-right:8px;">👥</span>
-                            <strong style="color:#2980b9; font-size: 16px;">${data.nombre}</strong>
-                        </div>
-                        <div style="padding-left: 28px; color: #555;">
-                            Gana: <strong>${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'}</strong> (${data.marcador}) | 1er Tpo: (${data.marcadorTiempo1 || '-'})<br>
-                            ⭐ MVP: ${data.jugadorMVP} | 🌟 Joven: ${data.mvpJoven || '-'}<br>
-                            ⚽ 1er Gol: ${data.primerGol || '-'} | 🥅 Penales: ${data.penales ? data.penales.toUpperCase() : '-'}
-                        </div>
+                        <strong>👥 ${data.nombre}</strong><br>
+                        Gana: ${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'} (${data.marcador}) | MVP: ${data.jugadorMVP}
                     </div>
                 `;
             });
-
             const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
             const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
-
             document.getElementById('textoConexion').innerText = `Cuadrillas participando: ${totalVotos}`;
-            
             document.getElementById('graficoBarras').style.display = 'block';
             document.getElementById('graficoBarras').innerHTML = `
-                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #2c3e50;">
-                    <span>Equipo A (${porcUnA}%)</span>
-                    <span>Equipo B (${porcUnB}%)</span>
-                </div>
-                <div style="display: flex; height: 24px; background-color: #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                    <div style="width: ${porcUnA}%; background-color: #3498db; transition: width 0.8s ease;"></div>
-                    <div style="width: ${porcUnB}%; background-color: #e74c3c; transition: width 0.8s ease;"></div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;"><span>A (${porcUnA}%)</span><span>B (${porcUnB}%)</span></div>
+                <div style="display: flex; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                    <div style="width: ${porcUnA}%; background: #3498db;"></div>
+                    <div style="width: ${porcUnB}%; background: #e74c3c;"></div>
                 </div>
             `;
-
-            if (listaHTML === "") {
-                listaPredicciones.innerHTML = '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Ninguna cuadrilla ha votado aún.</p>';
-            } else {
-                listaPredicciones.innerHTML = listaHTML;
-            }
+            document.getElementById('listaPredicciones').innerHTML = listaHTML || '<p style="text-align:center; padding:10px;">Aún no hay votos.</p>';
         });
     </script>
 </body>
