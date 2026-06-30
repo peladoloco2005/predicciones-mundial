@@ -177,8 +177,8 @@
 <body>
 
     <div class="container">
-        <!-- Imagen Banner -->
-        <img src="image_f6e307.png" alt="Nancagua Invierno 2026" class="header-image">
+        <!-- Imagen Banner actualizada con el nuevo nombre -->
+        <img src="ttvvimage.png" alt="Nancagua Invierno 2026" class="header-image">
         
         <div class="content-wrapper">
             <h1>🏆 Predicciones de la Final</h1>
@@ -309,13 +309,11 @@
         const db = getFirestore(app);
         const form = document.getElementById('predictionForm');
 
-        // Plantilla del mensaje de éxito que INCLUYE las reglas de puntuación
         const mensajeExitoHTML = `
             <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
                 <h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3>
                 <p style='margin:0;'>Los datos de tu cuadrilla han sido enviados exitosamente.</p>
             </div>
-            <!-- Mantenemos la tabla de puntos visible -->
             <div class="scoring-rules">
                 <h4>📋 ¿Cómo se reparten los puntos?</h4>
                 <ul>
@@ -359,7 +357,7 @@
                     });
                     
                     localStorage.setItem("yaVoto", "true");
-                    form.innerHTML = mensajeExitoHTML; // Muestra éxito + puntajes
+                    form.innerHTML = mensajeExitoHTML; 
                     
                 } catch (error) {
                     console.error("Error al guardar: ", error);
@@ -368,8 +366,7 @@
             });
         }
 
-        // LÓGICA DE LA CLAVE SECRETA
-        const claveSecreta = "nancagua26"; // <--- CAMBIA LA CLAVE AQUÍ SI QUIERES
+        const claveSecreta = "nancagua26";
         const btnDesbloquear = document.getElementById('btnDesbloquear');
         const cajaCandado = document.getElementById('cajaCandado');
         const listaPredicciones = document.getElementById('listaPredicciones');
@@ -378,14 +375,13 @@
         btnDesbloquear.addEventListener('click', () => {
             const claveIngresada = document.getElementById('inputClave').value;
             if(claveIngresada === claveSecreta) {
-                cajaCandado.style.display = 'none'; // Oculta el candado
-                listaPredicciones.style.display = 'block'; // Muestra el muro
+                cajaCandado.style.display = 'none'; 
+                listaPredicciones.style.display = 'block'; 
             } else {
-                errorClave.style.display = 'block'; // Muestra error
+                errorClave.style.display = 'block'; 
             }
         });
 
-        // LECTURA DE DATOS EN TIEMPO REAL
         onSnapshot(collection(db, "predicciones"), (snapshot) => {
             let totalVotos = 0;
             let votosA = 0;
@@ -417,7 +413,6 @@
             const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
             const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
 
-            // Actualizamos los textos sin sobreescribir el HTML de la clave
             document.getElementById('textoConexion').innerText = `Cuadrillas participando: ${totalVotos}`;
             
             document.getElementById('graficoBarras').style.display = 'block';
@@ -432,7 +427,6 @@
                 </div>
             `;
 
-            // Llenamos la lista del muro oculto
             if (listaHTML === "") {
                 listaPredicciones.innerHTML = '<p style="text-align:center; padding: 20px; color: #aaa; font-style:italic;">Ninguna cuadrilla ha votado aún.</p>';
             } else {
