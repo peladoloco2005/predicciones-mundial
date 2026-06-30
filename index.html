@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Predicciones: Final del Mundial</title>
     <style>
-        /* Estilos Generales - Volvemos al fondo verde previo */
+        /* Estilos Generales - Fondo verde previo */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1B4F31 0%, #2980b9 0%, #27ae60 100%);
@@ -36,7 +36,7 @@
             border-bottom: 5px solid #e67e22;
         }
 
-        /* Logo con fondo blanco aplicado */
+        /* Logo con fondo blanco */
         .mundial-logo {
             display: block;
             margin: 20px auto 10px auto;
@@ -45,8 +45,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             border: 2px solid #f1c40f;
-            background-color: #ffffff; /* Fondo blanco para el logo */
-            padding: 5px; /* Pequeño margen interno para el logo */
+            background-color: #ffffff; 
+            padding: 5px; 
         }
 
         .content-wrapper {
@@ -250,8 +250,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="youngMvp">Mejor Jugador Joven (MVP Joven):</label>
-                    <input type="text" id="youngMvp" placeholder="Ej: Lamine Yamal..." required>
+                    <label for="minFirstGoal">¿En qué minuto se marcará el primer gol?</label>
+                    <input type="number" id="minFirstGoal" placeholder="Ej: 15" min="1" max="120" required>
                 </div>
 
                 <div class="scoring-rules" id="reglasPuntaje">
@@ -260,7 +260,7 @@
                         <li><strong>5 pts:</strong> Acertar al resultado final exacto (90 mins).</li>
                         <li><strong>4 pts:</strong> Acertar al Jugador MVP.</li>
                         <li><strong>3 pts:</strong> Acertar al resultado exacto del 1er tiempo.</li>
-                        <li><strong>2 pts:</strong> Acertar al MVP Joven.</li>
+                        <li><strong>2 pts:</strong> Acertar el minuto del primer gol (margen +/- 5 min).</li>
                         <li><strong>1 pto:</strong> Acertar si van a penales (Sí o No).</li>
                     </ul>
                 </div>
@@ -277,7 +277,7 @@
                 <div style="text-align: center;">
                     <h3 style="color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #f1c40f; display:inline-block;">Muro de Cuadrillas 🔒</h3>
                     <div id="cajaCandado" class="locked-muro">
-                        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">Muro privado. Solo el administrador puede ver las predicciones.</p>
+                        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">Muro privado.</p>
                         <div style="display: flex; gap: 10px; justify-content: center;">
                             <input type="password" id="inputClave" placeholder="Ingresa la clave..." style="width: 200px;">
                             <button type="button" id="btnDesbloquear" style="width: auto; padding: 10px 15px; font-size: 14px;">Desbloquear</button>
@@ -312,16 +312,15 @@
         const mensajeExitoHTML = `
             <div style='text-align:center; padding: 20px; background:#e8f8f5; border-radius: 8px; border: 2px solid #27ae60; margin-bottom: 20px;'>
                 <h3 style='color: #27ae60; margin:0 0 10px 0;'>🏆 ¡Predicción Guardada!</h3>
-                <p style='margin:0;'>Los datos de tu cuadrilla han sido enviados exitosamente.</p>
             </div>
             <div class="scoring-rules">
                 <h4>📋 ¿Cómo se reparten los puntos?</h4>
                 <ul>
-                    <li><strong>5 pts:</strong> Acertar al resultado final exacto (90 mins).</li>
-                    <li><strong>4 pts:</strong> Acertar al Jugador MVP.</li>
-                    <li><strong>3 pts:</strong> Acertar al resultado exacto del 1er tiempo.</li>
-                    <li><strong>2 pts:</strong> Acertar al MVP Joven.</li>
-                    <li><strong>1 pto:</strong> Acertar si van a penales (Sí o No).</li>
+                    <li><strong>5 pts:</strong> Resultado final exacto.</li>
+                    <li><strong>4 pts:</strong> Jugador MVP.</li>
+                    <li><strong>3 pts:</strong> Resultado exacto 1er tiempo.</li>
+                    <li><strong>2 pts:</strong> Minuto del primer gol (+/- 5 min).</li>
+                    <li><strong>1 pto:</strong> Acertar si van a penales.</li>
                 </ul>
             </div>
         `;
@@ -341,7 +340,7 @@
                 const scoreHalfB = document.getElementById('scoreHalfB').value;
                 const firstGoal = document.getElementById('firstGoal').value;
                 const penalties = document.getElementById('penalties').value;
-                const youngMvp = document.getElementById('youngMvp').value;
+                const minFirstGoal = document.getElementById('minFirstGoal').value;
 
                 try {
                     await addDoc(collection(db, "predicciones"), {
@@ -350,25 +349,22 @@
                         marcador: `${scoreA} - ${scoreB}`,
                         jugadorMVP: mvp,
                         marcadorTiempo1: `${scoreHalfA} - ${scoreHalfB}`,
-                        primerGol: firstGoal,
+                        primerGolJugador: firstGoal,
                         penales: penalties,
-                        mvpJoven: youngMvp,
+                        minutoPrimerGol: minFirstGoal,
                         fecha: new Date()
                     });
                     localStorage.setItem("yaVoto", "true");
                     form.innerHTML = mensajeExitoHTML; 
                     seccionResultados.style.display = "block";
                 } catch (error) {
-                    console.error("Error al guardar: ", error);
-                    alert("Hubo un error al guardar. Revisa tu conexión.");
+                    alert("Error al guardar.");
                 }
             });
         }
 
-        const claveSecreta = "nancagua26";
         document.getElementById('btnDesbloquear').addEventListener('click', () => {
-            const claveIngresada = document.getElementById('inputClave').value;
-            if(claveIngresada === claveSecreta) {
+            if(document.getElementById('inputClave').value === "nancagua26") {
                 document.getElementById('cajaCandado').style.display = 'none'; 
                 document.getElementById('listaPredicciones').style.display = 'block'; 
             } else {
@@ -377,31 +373,19 @@
         });
 
         onSnapshot(collection(db, "predicciones"), (snapshot) => {
-            let totalVotos = 0, votosA = 0, votosB = 0, listaHTML = "";
+            let total = 0, listaHTML = "";
             snapshot.forEach((doc) => {
-                const data = doc.data();
-                totalVotos++;
-                if (data.equipoGanador === "equipoA") votosA++;
-                if (data.equipoGanador === "equipoB") votosB++;
+                const d = doc.data();
+                total++;
                 listaHTML += `
-                    <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 14px;">
-                        <strong>👥 ${data.nombre}</strong><br>
-                        Gana: ${data.equipoGanador === 'equipoA' ? 'Equipo A' : 'Equipo B'} (${data.marcador}) | MVP: ${data.jugadorMVP}
+                    <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <strong>👥 ${d.nombre}</strong><br>
+                        Gana: ${d.equipoGanador} | Min 1er Gol: ${d.minutoPrimerGol}
                     </div>
                 `;
             });
-            const porcUnA = totalVotos > 0 ? Math.round((votosA / totalVotos) * 100) : 0;
-            const porcUnB = totalVotos > 0 ? Math.round((votosB / totalVotos) * 100) : 0;
-            document.getElementById('textoConexion').innerText = `Cuadrillas participando: ${totalVotos}`;
-            document.getElementById('graficoBarras').style.display = 'block';
-            document.getElementById('graficoBarras').innerHTML = `
-                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;"><span>A (${porcUnA}%)</span><span>B (${porcUnB}%)</span></div>
-                <div style="display: flex; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
-                    <div style="width: ${porcUnA}%; background: #3498db;"></div>
-                    <div style="width: ${porcUnB}%; background: #e74c3c;"></div>
-                </div>
-            `;
-            document.getElementById('listaPredicciones').innerHTML = listaHTML || '<p style="text-align:center; padding:10px;">Aún no hay votos.</p>';
+            document.getElementById('textoConexion').innerText = `Cuadrillas: ${total}`;
+            document.getElementById('listaPredicciones').innerHTML = listaHTML;
         });
     </script>
 </body>
